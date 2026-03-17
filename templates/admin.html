@@ -4,24 +4,24 @@
 
 <div class="card">
     <h2>Admin Panel</h2>
-    <input type="password" id="adminToken" placeholder="Enter Admin Token">
-    <button onclick="loadFiles()">Load Files</button>
+    <!-- <input type="password" id="adminToken" placeholder="Enter Admin Token"> -->
+    <button onclick="loadFiles()">Vis Filer</button>
 </div>
 
 <div class="card">
-    <h3>Files in Store</h3>
+    <h3>Tilgjengelige dokumenter</h3>
     <ul id="fileList"></ul>
 </div>
 
 <div class="card">
-    <h3>Upload File</h3>
+    <h3>Legge til dokument</h3>
     <input type="file" id="fileInput">
-    <button onclick="uploadFile()">Upload</button>
+    <button onclick="uploadFile()">Legg til</button>
 </div>
 
 <script>
 async function loadFiles() {
-    const token = document.getElementById("adminToken").value;
+    //const token = document.getElementById("adminToken").value;
 
     const response = await fetch("/admin/files", {
         // headers: {

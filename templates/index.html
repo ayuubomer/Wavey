@@ -19,7 +19,7 @@
     <div id="chatMessages"></div>
 
     <form id="queryForm" class="chat-input">
-        <textarea name="query" id="queryInput" placeholder="Type your question..."></textarea>
+        <textarea name="query" id="queryInput" placeholder="Skriv..."></textarea>
         <button type="submit">Send</button>
     </form>
 </div>
@@ -28,13 +28,14 @@
     body{
     margin:0;
     font-family: Arial, sans-serif;
-    background:#f5f5f5;
+    background:#fff;
 }
 
 .chat-container{
     display:flex;
     flex-direction:column;
-    height:300px;
+    /* background-color: red; */
+    height: 80vh;
 }
 
 /* messages area */
@@ -57,7 +58,7 @@
 
 .user{
     align-self:flex-end;
-    background:#007bff;
+    background: #00859b;
     color:white;
 }
 
@@ -70,9 +71,10 @@
 .chat-input{
     display:flex;
     gap:10px;
-    padding:15px;
+    padding:15px 0;
     border-top:1px solid #ddd;
-    background:white;
+    /* background:white; */
+    justify-self: end;
 }
 
 .chat-input textarea{
@@ -86,7 +88,7 @@
 .chat-input button{
     padding:10px 18px;
     border:none;
-    background:#007bff;
+    background:#00859b;
     color:white;
     border-radius:10px;
     cursor:pointer;

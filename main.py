@@ -99,6 +99,7 @@ def generate_response(user_query: str):
                 "You are a precise website assistant. "
                 "Use provided documents to answer questions but you can use internet if needed"
                 "Don't make up answers if you don't know the answer. "
+                "only respond in norwegian, don not respond in any other language. "
                 'don not say "based on the provided documents" or "based on the information in the documents" '
             ),
             tools=[
@@ -163,7 +164,12 @@ def list_files():
 
 @app.route("/admin")
 def admin_page():
-    return render_template("admin.html")
+    files = client.file_search_stores.documents.list(parent=FILE_SEARCH_STORE_NAME)
+    # print(f"Files in store {FILE_SEARCH_STORE_NAME}: {files}")
+    # for file in files:
+        # print(f"File: {file.name}, Display Name: {getattr(file, 'display_name', None)}, State: {getattr(file, 'state', None)}")
+        # print(dir(file))
+    return render_template("admin.html", files=files)
 
 @app.route("/admin/upload", methods=["POST"])
 def upload_file():
@@ -198,6 +204,26 @@ def upload_file():
         print(f"Uploaded {file.filename} to file search store {FILE_SEARCH_STORE_NAME}")
 
         return jsonify({"message": f"File {file.filename} uploaded successfully"})
+
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+@app.route("/admin/files", methods=["DELETE"])
+def delete_file():
+    data = request.get_json()
+    file_name = data.get("file_name")
+
+    if not file_name:
+        return jsonify({"error": "Missing file_name"}), 400
+
+    try:
+        # force delete the file from the file search store
+        client.file_search_stores.documents.delete(
+            name=file_name,
+            config=types.DeleteDocumentConfig(force=True)
+        )
+        print(f"Deleted file {file_name} from file search store {FILE_SEARCH_STORE_NAME}")
+        return jsonify({"message": f"File {file_name} deleted successfully"})
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500

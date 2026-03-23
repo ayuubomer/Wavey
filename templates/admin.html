@@ -1,16 +1,23 @@
 {% extends "base.html" %}
 
 {% block content %}
-
+<!-- 
 <div class="card">
     <h2>Admin Panel</h2>
-    <!-- <input type="password" id="adminToken" placeholder="Enter Admin Token"> -->
+    <!-- <input type="password" id="adminToken" placeholder="Enter Admin Token"> --
     <button onclick="loadFiles()">Vis Filer</button>
-</div>
+</div> -->
 
 <div class="card">
     <h3>Tilgjengelige dokumenter</h3>
-    <ul id="fileList"></ul>
+    <ul id="fileList">
+        <!--  filer fra flask vises her -->
+          {% for file in files %}
+            <li>{{ file.display_name }} ({{ file.state.name }}) <button onclick="deleteFile('{{ file.name }}')">Slett</button></li>
+          {% endfor %}
+
+        <!-- <li>Eksempel dokument (tilgjengelig) <button onclick="deleteFile(this)">Slett</button></li> -->
+    </ul>
 </div>
 
 <div class="card">
@@ -20,33 +27,43 @@
 </div>
 
 <script>
-async function loadFiles() {
-    //const token = document.getElementById("adminToken").value;
-
-    const response = await fetch("/admin/files", {
-        // headers: {
-        //     "X-ADMIN-TOKEN": token
-        // }
-    });
-
-    const data = await response.json();
-
-    const list = document.getElementById("fileList");
-    list.innerHTML = "";
-
-    if (data.files) {
-        data.files.forEach(file => {
-            const li = document.createElement("li");
-            li.innerText = file.display_name + " (" + file.state + ")";
-            list.appendChild(li);
+    async function deleteFile(name) {
+        console.log("Sletting fil med ID:", name);
+        const response = await fetch("/admin/files", {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ file_name: name })
         });
-    } else {
-        list.innerText = data.error;
-    }
-}
+    } 
+// async function loadFiles() {
+//     //const token = document.getElementById("adminToken").value;
+
+//     const response = await fetch("/admin/files", {
+//         // headers: {
+//         //     "X-ADMIN-TOKEN": token
+//         // }
+//     });
+
+//     const data = await response.json();
+
+//     const list = document.getElementById("fileList");
+//     list.innerHTML = "";
+
+//     if (data.files) {
+//         data.files.forEach(file => {
+//             const li = document.createElement("li");
+//             li.innerText = file.display_name + " (" + file.state + ")";
+//             list.appendChild(li);
+//         });
+//     } else {
+//         list.innerText = data.error;
+//     }
+// }
 
 async function uploadFile() {
-    const token = document.getElementById("adminToken").value;
+    // const token = document.getElementById("adminToken").value;
     const fileInput = document.getElementById("fileInput");
 
     const formData = new FormData();
@@ -55,7 +72,7 @@ async function uploadFile() {
     const response = await fetch("/admin/upload", {
         method: "POST",
         headers: {
-            "X-ADMIN-TOKEN": token
+            // "X-ADMIN-TOKEN": token
         },
         body: formData
     });

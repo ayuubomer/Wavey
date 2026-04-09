@@ -2,20 +2,7 @@
 
 {% block content %}
 
-<!-- <div class="card">
-    <h2>Ask a Question</h2>
-    <form id="queryForm">
-        <textarea name="query" rows="4" placeholder="Type your question..."></textarea>
-        <button type="submit">Ask</button>
-    </form>
-</div>
--->
-<!-- <div class="card">
-    <h3>Response</h3>
-    <div id="responseBox"></div>
-</div> -->
-
-<div class="chat-container">
+<div class="chat-container ">
     <div id="chatMessages"></div>
 
     <form id="queryForm" class="chat-input">
@@ -112,36 +99,17 @@ document.getElementById("queryForm").addEventListener("submit", async function(e
     const response = await fetch("/query", {
         method: "POST",
         body: formData,
-        // headers: {
-        //     "Content-Type": "application/json"
-        // }
+        
     });
 
     const data = await response.json();
 
-    // document.getElementById("responseBox").innerText =
-    //     data.response || data.error;
     addMessage(data.response || data.error, "bot");
 });
 
 const form = document.getElementById("queryForm");
 const input = document.getElementById("queryInput");
 const chat = document.getElementById("chatMessages");
-
-// form.addEventListener("submit", function(e){
-//     e.preventDefault();
-
-//     const text = input.value.trim();
-//     if(!text) return;
-
-//     addMessage(text, "user");
-//     input.value = "";
-
-//     // simulate bot response
-//     setTimeout(()=>{
-//         addMessage("Bot response example...", "bot");
-//     },500);
-// });
 
 function addMessage(text, type){
     const msg = document.createElement("div");

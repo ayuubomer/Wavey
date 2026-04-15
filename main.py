@@ -9,10 +9,6 @@ import security
 
 load_dotenv()
 
-# --------------------------------------------------
-# App Setup
-# --------------------------------------------------
-
 app = Flask(__name__)
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")

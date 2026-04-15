@@ -2,7 +2,8 @@
 
 {% block content %}
 
-<div class="chat-container">
+<div class="chat-container ">
+    <div id="chatMessages"></div>
 
     <!-- FEED  -->
     <div id="chatMessages">
@@ -349,11 +350,16 @@
         if (t.includes("vekst")) return "Vi hjelper deg med vekst og skalering.";
         if (t.includes("hei") || t.includes("hello")) return "Hei! Hva kan jeg hjelpe deg med?";
 
-        return "Takk! Jeg kan hjelpe deg med vekst, eksport og skalering.";
-    }
+    const response = await fetch("/query", {
+        method: "POST",
+        body: formData,
+        
+    });
 
-    form.addEventListener("submit", async function (e) {
-        e.preventDefault();
+    const data = await response.json();
+
+    addMessage(data.response || data.error, "bot");
+});
 
         const text = input.value.trim();
         if (!text) return;

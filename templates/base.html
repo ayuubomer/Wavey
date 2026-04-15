@@ -1,35 +1,22 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-    <title>Wavey</title>
+    <title></title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400;600;700&display=swap');
         body {
-            font-family: Arial;
+            font-family: Lato, Arial, Helvetica, sans-serif;
             /* max-width: 800px; */
-            margin: 40px auto;
-            width: 92%;
-            padding: 20px;
-        }
-        button {
-            padding: 8px 16px;
-            cursor: pointer;
-        }
-        input, textarea {
+            margin: 0;
             width: 100%;
-            padding: 8px;
-            margin-bottom: 10px;
-        }
-        .card {
-            border: 1px solid #ddd;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 6px;
+            padding: 20px;
         }
     </style>
 </head>
+
 <body>
-    <h1>Wavey</h1>
-    <hr>
     {% block content %}{% endblock %}
 </body>
+
 </html>

@@ -1,0 +1,3 @@
+const hurtigvalgspørsmål = [
+    "Hvilke betalingsløsninger"
+]

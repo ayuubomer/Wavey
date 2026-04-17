@@ -1,3 +1,0 @@
-const hurtigvalgspørsmål = [
-    "Hvilke betalingsløsninger"
-]

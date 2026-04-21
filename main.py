@@ -200,7 +200,18 @@ def admin_page():
         files = client.file_search_stores.documents.list(
             parent=FILE_SEARCH_STORE_NAME
         )
-        return render_template("admin.html", files=files)
+
+        def format_size(bytes_size):
+            for unit in ["B", "KB", "MB", "GB", "TB"]:
+                if bytes_size < 1024:
+                    return f"{bytes_size:.2f} {unit}"
+                bytes_size /= 1024
+            return f"{bytes_size:.2f} PB"
+
+        total_size_bytes = sum(getattr(f, "size_bytes", 0) for f in files)
+        total_size_formatted = format_size(total_size_bytes)
+
+        return render_template("admin.html", files=files, total_size=total_size_formatted)
     except Exception:
         return render_template("admin.html", files=[])
 

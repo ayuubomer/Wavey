@@ -1,36 +1,351 @@
 {% extends "base.html" %}
 
 {% block content %}
+<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Adminpanel</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-<style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background-color: var(--color-background-tertiary, #f9f9f9);
+      padding: 2rem 1rem;
+      color: var(--color-text-primary, #1a1a1a);
+    }
 
-</style>
-<!-- 
-<div class="card">
-    <h2>Admin Panel</h2>
-    <!-- <input type="password" id="adminToken" placeholder="Enter Admin Token"> --
-    <button onclick="loadFiles()">Vis Filer</button>
-</div> -->
+    .hidden {
+      display: none;
+    }
 
-<div class="card">
-    <h3>Tilgjengelige dokumenter</h3>
-    <ul id="fileList">
-        <!--  filer fra flask vises her -->
-          {% for file in files %}
-            <li>{{ file.display_name }} ({{ file.state.name }}) <button onclick="deleteFile('{{ file.name }}')">Slett</button></li>
-          {% endfor %}
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+    }
 
-        <!-- <li>Eksempel dokument (tilgjengelig) <button onclick="deleteFile(this)">Slett</button></li> -->
-    </ul>
-</div>
+    .header {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
 
-<div class="card">
-    <h3>Legge til dokument</h3>
-    <input type="file" id="fileInput">
-    <button onclick="uploadFile()">Legg til</button>
-</div>
+    .header h1 {
+      font-size: 32px;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+      color: var(--color-text-primary, #333);
+    }
 
-<script>
+    .header p {
+      font-size: 14px;
+      color: var(--color-text-secondary, #666);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .stat-card {
+      background-color: var(--color-background-primary, #fff);
+      border: 1px solid var(--color-border-tertiary, rgba(0,0,0,0.1));
+      border-radius: var(--border-radius-lg, 12px);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+    }
+
+    .stat-card-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+      width: 100%;
+      justify-content: space-between;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: var(--color-text-secondary, #888);
+      font-weight: 500;
+    }
+
+    .stat-icon {
+      width: 20px;
+      height: 20px;
+      color: var(--color-text-tertiary, #bbb);
+    }
+
+    .stat-value {
+      font-size: 36px;
+      font-weight: 500;
+      color: var(--color-info, #0D8BA7);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-unit {
+      font-size: 12px;
+      color: var(--color-text-tertiary, #aaa);
+    }
+
+    .upload-section {
+      background-color: var(--color-background-primary, #fff);
+      border: 2px dashed var(--color-border-tertiary, rgba(0,0,0,0.15));
+      border-radius: var(--border-radius-lg, 12px);
+      padding: 3rem 2rem;
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+
+    .upload-icon {
+      font-size: 48px;
+      margin-bottom: 1rem;
+      color: var(--color-text-tertiary, #ccc);
+    }
+
+    .upload-text {
+      font-size: 14px;
+      color: var(--color-text-secondary, #666);
+      margin-bottom: 1.5rem;
+      line-height: 1.5;
+    }
+
+    .upload-button {
+      background-color: var(--color-info, #0D8BA7);
+      color: white;
+      border: none;
+      padding: 0.75rem 2rem;
+      border-radius: var(--border-radius-md, 8px);
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background-color 0.2s;
+    }
+
+    .upload-button:hover {
+      background-color: var(--color-info-darker, #096680);
+    }
+
+    .documents-section {
+      background-color: var(--color-background-primary, #fff);
+      border: 1px solid var(--color-border-tertiary, rgba(0,0,0,0.1));
+      border-radius: var(--border-radius-lg, 12px);
+      padding: 1.5rem;
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 500;
+      color: var(--color-text-primary, #333);
+    }
+
+    .search-box {
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--color-border-tertiary, rgba(0,0,0,0.1));
+      border-radius: var(--border-radius-md, 8px);
+      font-size: 13px;
+      color: var(--color-text-secondary, #666);
+      width: 180px;
+      background-color: var(--color-background-secondary, #f5f5f5);
+    }
+
+    .search-box::placeholder {
+      color: var(--color-text-tertiary, #aaa);
+    }
+
+    .document-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .document-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1rem;
+      border-bottom: 1px solid var(--color-border-tertiary, rgba(0,0,0,0.08));
+      font-size: 14px;
+    }
+
+    .document-item:last-child {
+      border-bottom: none;
+    }
+
+    .document-name {
+      color: var(--color-text-primary, #333);
+      font-weight: 400;
+    }
+
+    .delete-button {
+      background: none;
+      border: none;
+      color: var(--color-danger, #DC3545);
+      cursor: pointer;
+      font-size: 16px;
+      padding: 0.25rem 0.5rem;
+      transition: opacity 0.2s;
+    }
+
+    .delete-button:hover {
+      opacity: 0.7;
+    }
+
+    .upload-section.loading {
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
+    .loader {
+        margin-top: 10px;
+        width: 30px;
+        height: 30px;
+        border: 4px solid #ccc;
+        border-top: 4px solid #333;
+        border-radius: 50%;
+        animation: spin 1s linear infinite;
+        justify-self: center;
+    }
+
+    @keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+    }
+  </style>
+
+
+  <div class="container">
+    <div class="header">
+      <h1>Adminpanel</h1>
+      <p>Her kan du laste opp og slette dokumenter, og se en oversikt over dokumenter</p>
+    </div>
+
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <span class="stat-label">Antall dokumenter opplistet</span>
+          <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path>
+            <polyline points="13 2 13 9 20 9"></polyline>
+          </svg>
+        </div>
+        <div class="stat-value">{{ files|length }}</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <span class="stat-label">Mengde lagring brukt</span>
+          <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+        </div>
+        <div class="stat-value">{{ total_size }}</div>
+      </div>
+
+      <div class="stat-card">
+        <div class="stat-card-header">
+          <span class="stat-label">Sist opplastet dokument</span>
+          <svg class="stat-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="10"></circle>
+            <polyline points="12 6 12 12 16 14"></polyline>
+          </svg>
+        </div>
+        <div class="stat-value">{{ files[-1].create_time.date() }}</div>
+      </div>
+    </div>
+
+    <div class="upload-section">
+      <div class="upload-icon">↑</div>
+      <div class="upload-text">Dra og slipp dokumenter her for å laste opp eller klikk for å velge fra enheten din</div>
+        <div class="loader hidden" id="loader"></div>
+      <input class="hidden" type="file" id="fileInput">
+      <button class="upload-button">Velg dokumenter</button>
+    </div>
+
+    <div class="documents-section">
+      <div class="section-header">
+        <h2 class="section-title">Alle dokumenter</h2>
+        <input type="text" class="search-box" placeholder="Søk">
+      </div>
+      <div class="document-list">
+        {% for file in files %}
+            <div class="document-item">
+                <span class="document-name">{{ file.display_name }}</span>
+                <button onclick="deleteFile('{{ file.name }}')" class="delete-button"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-trash2-icon lucide-trash-2"><path d="M10 11v6"/><path d="M14 11v6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M3 6h18"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg></button>
+            </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const fileInput = document.getElementById('fileInput');
+
+    document.querySelectorAll('.delete-button').forEach(button => {
+      button.addEventListener('click', function(e) {
+        e.target.closest('.document-item').style.opacity = '0.5';
+        setTimeout(() => {
+          e.target.closest('.document-item').remove();
+        }, 300);
+      });
+    });
+
+    document.querySelector('.search-box').addEventListener('input', function(e) {
+      const query = e.target.value.toLowerCase();
+      document.querySelectorAll('.document-item').forEach(item => {
+        const name = item.querySelector('.document-name').textContent.toLowerCase();
+        item.style.display = name.includes(query) ? 'flex' : 'none';
+      });
+    });
+
+    document.querySelector('.upload-button').addEventListener('click', function() {
+      fileInput.click();
+    });
+
+    fileInput.addEventListener('change', async function() {
+      if (fileInput.files.length > 0) {
+        await uploadFile();
+      }
+    });
+
+    async function uploadFile() {
+        const fileInput = document.getElementById("fileInput");
+
+        document.querySelector('.upload-section').classList.add('loading');
+        document.getElementById("loader").classList.remove('hidden');
+
+        const formData = new FormData();
+        formData.append("file", fileInput.files[0]);
+
+        const response = await fetch("/admin/upload", {
+            method: "POST",
+            body: formData
+        });
+
+        const data = await response.json();
+
+        alert(data.message || data.error);
+        document.querySelector('.upload-section').classList.remove('loading');
+        document.getElementById("loader").classList.add('hidden');
+        window.location.reload();
+    }
+
     async function deleteFile(name) {
         console.log("Sletting fil med ID:", name);
         const response = await fetch("/admin/files", {
@@ -40,50 +355,8 @@
             },
             body: JSON.stringify({ file_name: name })
         });
+        alert("Filen er slettet");
+        window.location.reload();
     } 
-// async function loadFiles() {
-//     //const token = document.getElementById("adminToken").value;
-
-//     const response = await fetch("/admin/files", {
-//         // headers: {
-//         //     "X-ADMIN-TOKEN": token
-//         // }
-//     });
-
-//     const data = await response.json();
-
-//     const list = document.getElementById("fileList");
-//     list.innerHTML = "";
-
-//     if (data.files) {
-//         data.files.forEach(file => {
-//             const li = document.createElement("li");
-//             li.innerText = file.display_name + " (" + file.state + ")";
-//             list.appendChild(li);
-//         });
-//     } else {
-//         list.innerText = data.error;
-//     }
-// }
-
-async function uploadFile() {
-    // const token = document.getElementById("adminToken").value;
-    const fileInput = document.getElementById("fileInput");
-
-    const formData = new FormData();
-    formData.append("file", fileInput.files[0]);
-
-    const response = await fetch("/admin/upload", {
-        method: "POST",
-        headers: {
-            // "X-ADMIN-TOKEN": token
-        },
-        body: formData
-    });
-
-    const data = await response.json();
-    alert(data.message || data.error);
-}
-</script>
-
+  </script>
 {% endblock %}

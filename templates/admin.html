@@ -249,7 +249,7 @@
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
   z-index: 1000;
   opacity: 0;
-  transition: opacity 0.3s;
+  transition: opacity 0.9s;
   pointer-events: none;
   white-space: nowrap;
   font-weight: 500;
@@ -383,7 +383,9 @@
         showToast(data.message ? 'Filen ble lastet opp.' : 'Feil ved opplasting.', data.message ? 'success' : 'danger');
         document.querySelector('.upload-section').classList.remove('loading');
         document.getElementById("loader").classList.add('hidden');
-        window.location.reload();
+        setTimeout(() => {
+           window.location.reload();
+        }, 1000);
     }
 
     async function deleteFile(name) {
@@ -396,7 +398,10 @@
             body: JSON.stringify({ file_name: name })
         });
         showToast('Filen er slettet.', 'danger');
-        window.location.reload();
+        setTimeout(() => {
+           window.location.reload();
+        }, 1000);
+       
     } 
   </script>
 

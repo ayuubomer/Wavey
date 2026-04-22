@@ -5,7 +5,8 @@
 <div class="app-layout">
     <aside class="sidebar">
         <div class="sidebar-section">
-            <h1>Wavey
+            <h1>
+                Wavey
                 <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                     class="lucide lucide-panel-left-icon lucide-panel-left">
@@ -41,7 +42,10 @@
                             <path d="M22 21v-2a4 4 0 0 0-3-3.87" />
                             <circle cx="9" cy="7" r="4" />
                         </svg>
-                        Ambassadører
+                        <span class="kategori-text">
+                            <span class="kategori-title">Ambassadører</span>
+                            <span class="kategori-count"></span>
+                        </span>
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             class="lucide lucide-chevron-right-icon lucide-chevron-right">
@@ -64,7 +68,10 @@
                             <path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20" />
                             <path d="M2 12h20" />
                         </svg>
-                        Eksport
+                        <span class="kategori-text">
+                            <span class="kategori-title">Eksport</span>
+                            <span class="kategori-count"></span>
+                        </span>
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             class="lucide lucide-chevron-right-icon lucide-chevron-right">
@@ -85,7 +92,11 @@
                             <path d="M16 7h6v6" />
                             <path d="m22 7-8.5 8.5-5-5L2 17" />
                         </svg>
-                        Vekst
+                        <span class="kategori-text">
+                            <span class="kategori-title">Vekst</span>
+                            <span class="kategori-count"></span>
+                        </span>
+
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             class="lucide lucide-chevron-right-icon lucide-chevron-right">
@@ -111,7 +122,11 @@
                             <path d="M3 8V3h5" />
                             <path d="M9 9 3 3" />
                         </svg>
-                        Skalering
+                        <span class="kategori-text">
+                            <span class="kategori-title">Skalering</span>
+                            <span class="kategori-count"></span>
+                        </span>
+
                         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none"
                             stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                             class="lucide lucide-chevron-right-icon lucide-chevron-right">
@@ -145,8 +160,19 @@
 
             <!-- WELCOME SCREEN  -->
             <div class="welcome">
-
-                <h1 class="logo">Wavey</h1>
+                <div class="robot-icon"><svg xmlns="http://www.w3.org/2000/svg" width="60" height="60"
+                        viewBox="0 0 24 24" fill="none" stroke="#00859b" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" class="lucide lucide-bot-icon lucide-bot">
+                        <path d="M12 8V4H8" />
+                        <rect width="16" height="12" x="4" y="8" rx="2" />
+                        <path d="M2 14h2" />
+                        <path d="M20 14h2" />
+                        <path d="M15 13v2" />
+                        <path d="M9 13v2" />
+                    </svg>
+                </div>
+                <h1 class="logo">Wavey
+                </h1>
 
                 <h2 class="title">Hva kan jeg hjelpe deg med?</h2>
 
@@ -310,31 +336,6 @@
         }
     }
 
-    /* 
-    @keyframes waveyEntrance {
-        0% {
-            opacity: 0;
-            transform: translateY(24px) scale(0.92);
-            letter-spacing: 0.15em;
-        }
-
-        60% {
-            opacity: 1;
-            transform: translateY(-4px) scale(1.03);
-            letter-spacing: 0.02em;
-        }
-
-        100% {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-            letter-spacing: normal;
-        }
-    }
-
-    .logo {
-        animation: waveyEntrance 2.2s cubic-bezier(0.22, 1, 0.36, 1) both;
-    } */
-
     @keyframes waveyEntrance {
         0% {
             opacity: 0;
@@ -396,13 +397,6 @@
 
     /* Spørrebank Section */
     .spørrebank {
-        /*
-        display: flex;
-        flex-direction: column;
-        gap: 0.25rem;
-        overflow-y:auto ; */
-
-
         flex: 1 1 auto;
         min-height: 0;
         overflow-y: scroll;
@@ -412,6 +406,7 @@
         display: flex;
         flex-direction: column;
     }
+
 
     .spørrebank::-webkit-scrollbar {
         width: 4px;
@@ -461,45 +456,107 @@
     .spørrebank>div {
         display: flex;
         flex-direction: column;
-        gap: 0.25rem;
+        gap: 8px;
     }
 
-    /* Kategori Items */
     .kategori {
-        transition: all 0.2s ease;
+        background: white;
+        border-radius: 14px;
+        border: 1px solid #e8ecf0;
+        overflow: hidden;
+        transition: box-shadow 0.2 ease;
+    }
+
+    .kategori:hover {
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.06);
     }
 
     .kategori h2 {
-        padding-right: 1.7rem;
-        width: calc(100% - 8px);
+        box-sizing: border-box;
+        width: 100%;
         display: flex;
         align-items: center;
-        justify-content: flex-start;
-        gap: 0.75rem;
-        padding: 0.75rem 1rem;
+        gap: 12px;
+        padding: 8px 14px;
         background: transparent;
-        color: #374151;
         border: none;
-        border-radius: 0.5rem;
+        margin: 0;
+        cursor: pointer;
         font-size: 0.875rem;
         font-weight: 400;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        margin: 0;
     }
 
-    .kategori:hover h2 {
-        background-color: #f3f4f6;
+    .kategori h2 svg:first-child {
+        border: none;
+        border-radius: 8px;
+        padding: 8px;
+        box-sizing: content-box;
+        background: rgba(0, 133, 155, 0.08);
+        flex-shrink: 0;
+    }
+
+    .kategori-text {
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .kategori-title {
+        font-size: 14px;
+        font-weight: 600;
+        color: #111827;
+    }
+
+    .kategori-count {
+        font-size: 12px;
+        color: #6b7280;
+        margin-top: 1px;
     }
 
     .kategori h2 svg {
         color: var(--brand);
     }
 
-    .kategori h2 svg:last-child{
-        margin-left: auto;
+    .kategori h2 svg:last-child {
+        color: #00959b;
+        flex-shrink: 0;
         transition: transform 0.2s ease;
     }
+
+    .kategori ul {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        max-height: 0;
+        overflow: hidden;
+        transition: max-height 0.25s ease, padding 0.25s ease;
+    }
+
+
+    .kategori.open ul {
+        max-height: 1000px;
+        padding-bottom: 10px;
+    }
+
+    .kategori ul li {
+        font-size: 12px;
+        color: #374151;
+        padding: 10px 14px;
+        border-radius: 6px;
+        cursor: pointer;
+        line-height: 1.4;
+        border-bottom: 2px solid #f3f4f6;
+    }
+
+    .kategori ul li:hover {
+        background: #f3f4f6;
+    }
+
+    .kategori ul li:last-child {
+        border-bottom: none;
+    }
+
 
     .sidebar {
         display: flex;
@@ -509,7 +566,7 @@
         width: 16rem;
         padding: 16px 12px;
         box-sizing: border-box;
-        background: whitesmoke;
+        background: #fcfdff;
         border-right: 1px solid var(--rule);
         transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
@@ -558,12 +615,10 @@
         align-items: center;
         gap: 8px;
         justify-content: space-between;
-        font-weight: 500;
-        /*
-        margin: 0;
-        font-size: var(--font);
-        margin-bottom: 10px;
-        */
+        font-weight: 700;
+        color: #00859b;
+        margin-bottom: 2rem;
+        font-size: 30px;
     }
 
     .nw-chat {
@@ -573,7 +628,7 @@
         flex-direction: row;
         gap: 15px;
         border-radius: 10px;
-        margin-bottom: 1rem;
+        margin-bottom: 3rem;
         background-color: var(--brand);
         color: white;
         border: none;
@@ -588,58 +643,8 @@
         height: 20px;
     }
 
-    .sidebar-section h2 {
-        margin: 0;
-        padding: 10px 12px;
-        background: var(--brand);
-        color: white;
-        border-radius: 10px;
-        cursor: pointer;
-        font-size: 1rem;
-        font-weight: 500;
-        transition: 0.15s;
-    }
-
-    .sidebar-section h2:hover {
-        background: var(--brand-dark);
-    }
-
-    .kategori ul {
-        margin: 0;
-        padding: 0 0 0 1rem;
-        list-style: none;
-        max-height: 0;
-        overflow: hidden;
-        transition: max-height 0.25s ease, padding 0.25s ease;
-    }
-
-    .kategori.open ul {
-        max-height: 1000px;
-        padding-bottom: 8px;
-    }
-
-    .kategori h2::after {
-        margin-left: auto;
-        font-size: 1.1rem;
-        color: #9ca3af;
-        transition: transform 0.2s ease;
-        display: inline-block;
-    }
-
     .kategori.open h2 svg:last-child {
         transform: rotate(90deg);
-    }
-
-    .kategori ul li {
-        font-size: 12px;
-        color: #6b7280;
-        padding: 4px 8px;
-        cursor: pointer;
-        border-radius: 6px;
-    }
-
-    .kategori ul li:hover {
-        background: var(--brand);
     }
 
     /* CONTAINER */
@@ -700,12 +705,21 @@
     /* WELCOME UI */
     .welcome {
         text-align: center;
-        padding: 40px 20px;
+        padding: 20px 20px;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .robot-icon {
+        margin-bottom: 0;
     }
 
     .logo {
         font-size: 64px;
         color: var(--brand);
+        margin-top: 0;
         margin-bottom: 10px;
     }
 
@@ -718,20 +732,6 @@
         max-width: 520px;
         margin: 0 auto 20px;
         color: var(--ink-3);
-    }
-
-    /* CHIPS */
-    .chips {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 10px;
-    }
-
-    .chip {
-        padding: 10px;
-        border-radius: 999px;
-        border: 1px solid var(--rule);
-        font-size: 12px;
     }
 
     /* INPUT */
@@ -787,15 +787,6 @@
             box-shadow 0.18s;
     }
 
-    .card {
-        border: 1px solid #ddd;
-        padding: 15px;
-        margin-bottom: 20px;
-        border-radius: 6px;
-    }
-
-
-
     /* WRAPPER */
 
     .topics {
@@ -809,8 +800,10 @@
         padding: 14px;
         border: 1px solid var(--rule);
         border-radius: 12px;
+        background: #fff;
         cursor: pointer;
         text-align: center;
+
         background: #fff;
         display: flex;
         flex-direction: column;
@@ -831,16 +824,6 @@
         margin-bottom: 20px;
     }
 
-    /* MAIN CARD */
-    .topic-card {
-        padding: 14px;
-        border: 1px solid var(--rule);
-        border-radius: 12px;
-        background: #fff;
-        cursor: pointer;
-        transition: 0.15s ease;
-        text-align: center;
-    }
 
     /* hover effect */
     .topic-card:hover {
@@ -973,6 +956,19 @@
     sidebarOpenBtn.addEventListener('click', () => {
         sidebar.classList.remove('collapsed');
         sidebarOpenBtn.style.display = 'none';
+    });
+
+    document.querySelectorAll('.kategori').forEach(kategori => {
+        const count = kategori.querySelectorAll('ul li').length;
+        const countEl = kategori.querySelector('.kategori-count');
+        if (countEl) countEl.textContent = count + ' spørsmål';
+    });
+
+    document.querySelectorAll('.kategori ul li').forEach(li => {
+        li.addEventListener('click', () => {
+            input.value = li.textContent.trim();
+            form.dispatchEvent(new Event('submit'));
+        });
     });
 
 

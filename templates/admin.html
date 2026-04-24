@@ -276,7 +276,12 @@
             <polyline points="12 6 12 12 16 14"></polyline>
           </svg>
         </div>
-        <div class="stat-value">{{ files[-1].create_time.date() }}</div>
+        <!-- check if files list is not empty -->
+        {% if files %}
+          <div class="stat-value">{{ files[-1].create_time.date()  }}</div>
+        {% else %}
+          <div class="stat-value"></div>
+        {% endif %}
       </div>
     </div>
 

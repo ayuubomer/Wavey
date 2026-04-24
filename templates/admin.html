@@ -237,6 +237,26 @@
         transform: rotate(360deg);
     }
     }
+
+    /* Toast-varsling for opplasting og sletting */
+    .toast {
+  position: fixed;
+  bottom: 1.5rem;
+  right: 1.5rem;
+  border-radius: var(--border-radius-md, 8px);
+  padding: 0.75rem 1.25rem;
+  font-size: 13px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  z-index: 1000;
+  opacity: 0;
+  transition: opacity 0.9s;
+  pointer-events: none;
+  white-space: nowrap;
+  font-weight: 500;
+}
+.toast.show { opacity: 1; }
+.toast.success { background-color: #EAF3DE; border: 1px solid #97C459; color: #27500A; }
+.toast.danger { background-color: #FCEBEB; border: 1px solid #F09595; color: #791F1F; }
   </style>
 
 
@@ -310,6 +330,16 @@
   </div>
 
   <script>
+    /* Viser en kort varsling nederst til høyre */
+    function showToast(msg, type) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 3000);
+}
+    
     const fileInput = document.getElementById('fileInput');
 
     document.querySelectorAll('.delete-button').forEach(button => {
@@ -355,10 +385,12 @@
 
         const data = await response.json();
 
-        alert(data.message || data.error);
+        showToast(data.message ? 'Filen ble lastet opp.' : 'Feil ved opplasting.', data.message ? 'success' : 'danger');
         document.querySelector('.upload-section').classList.remove('loading');
         document.getElementById("loader").classList.add('hidden');
-        window.location.reload();
+        setTimeout(() => {
+           window.location.reload();
+        }, 1000);
     }
 
     async function deleteFile(name) {
@@ -370,8 +402,14 @@
             },
             body: JSON.stringify({ file_name: name })
         });
-        alert("Filen er slettet");
-        window.location.reload();
+        showToast('Filen er slettet.', 'danger');
+        setTimeout(() => {
+           window.location.reload();
+        }, 1000);
+       
     } 
   </script>
+
+  <!-- Toast-element som vises ved opplasting og sletting -->
+  <div class="toast" id="toast"></div>
 {% endblock %}

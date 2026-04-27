@@ -22,7 +22,7 @@ if not FILE_SEARCH_STORE_NAME:
 
 client = genai.Client(api_key=GEMINI_API_KEY)
 
-LLM_TIMEOUT_SECONDS = 10
+LLM_TIMEOUT_SECONDS = 200
 FALLBACK_TOKEN = "FALLBACK_TO_SEARCH"
 
 # --------------------------------------------------
@@ -77,7 +77,8 @@ def _safe_llm_call(func, *args):
         future = executor.submit(func, *args)
         try:
             return future.result(timeout=LLM_TIMEOUT_SECONDS)
-        except Exception:
+        except Exception as e:
+            print(f"[_safe_llm_call] Timeout or error: {e}")
             return None
 
 # --------------------------------------------------
@@ -87,7 +88,7 @@ def _safe_llm_call(func, *args):
 def _ask_documents(clean_query: str) -> str | None:
     try:
         response = client.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-3-flash-preview",
             contents=_wrap_query(clean_query),
             config=types.GenerateContentConfig(
                 system_instruction=_SYSTEM_INSTRUCTION +
@@ -95,28 +96,30 @@ def _ask_documents(clean_query: str) -> str | None:
                 f"If not found, respond EXACTLY with: {FALLBACK_TOKEN}",
                 tools=[
                     types.Tool(
-                        retrieval=types.Retrieval(
-                            file_search=types.RetrievalFileSearch(
-                                file_search_store_name=FILE_SEARCH_STORE_NAME
+                            file_search=types.FileSearch(
+                                file_search_store_names=[FILE_SEARCH_STORE_NAME]
                             )
                         )
-                    )
                 ],
             ),
         )
-        return (response.text or "").strip()
-    except Exception:
+        
+        text = (response.text or "").strip()
+        print(f"[_ask_documents] response: {text[:100]}")
+        return text
+    except Exception as e:
+        print(f"[_ask_documents] Error: {e}")
         return None
 
 
 def _ask_web(clean_query: str) -> str | None:
     try:
         response = client.models.generate_content(
-            model="gemini-2.0-flash",
+            model="gemini-3-flash-preview",
             contents=_wrap_query(clean_query),
             config=types.GenerateContentConfig(
                 system_instruction=_SYSTEM_INSTRUCTION +
-                "\n\nUse Google Search for factual company information.",
+                "\n\nUse Google Search for factual information.",
                 tools=[
                     types.Tool(
                         google_search=types.GoogleSearch()
@@ -124,27 +127,49 @@ def _ask_web(clean_query: str) -> str | None:
                 ],
             ),
         )
-        return (response.text or "").strip()
-    except Exception:
+        text = (response.text or "").strip()
+        print(f"[_ask_web] response: {text[:100]}")
+        return text
+    except Exception as e:
+        print(f"[_ask_web] Error: {e}")
         return None
 
-
 def generate_website_answer(clean_query: str) -> str:
-    # Step 1: Try documents
-    doc_answer = _safe_llm_call(_ask_documents, clean_query)
+    print(f"[generate] Query: {clean_query}")
 
-    # If docs WORK and return real answer
+    doc_answer = _safe_llm_call(_ask_documents, clean_query)
+    print(f"[generate] doc_answer: {repr(doc_answer)}")
+
     if doc_answer and doc_answer != FALLBACK_TOKEN:
         return doc_answer
 
-    # Step 2: Try web (fallback for BOTH failure + no results)
     web_answer = _safe_llm_call(_ask_web, clean_query)
+    print(f"[generate] web_answer: {repr(web_answer)}")
 
     if web_answer:
         return web_answer
 
-    # Step 3: ONLY if EVERYTHING fails
     return "Tjenesten svarte ikke. Prøv igjen senere."
+
+#def generate_website_answer(clean_query: str) -> str:
+    # Step 1: Try documents
+    #doc_answer = _safe_llm_call(_ask_documents, clean_query)
+
+    # If docs WORK and return real answer
+    #if doc_answer and doc_answer != FALLBACK_TOKEN:
+    ##    return doc_answer
+
+    # Step 2: Try web (fallback for BOTH failure + no results)
+    #web_answer = _safe_llm_call(_ask_web, clean_query)
+
+    #if web_answer:
+    #    return web_answer
+
+    # Step 3: ONLY if EVERYTHING fails
+    #return "Tjenesten svarte ikke. Prøv igjen senere."
+    
+
+
 
 # --------------------------------------------------
 # Routes

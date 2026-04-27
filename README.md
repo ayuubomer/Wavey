@@ -6,7 +6,7 @@
 
 ## Formål
 
-Wavey er en chatbot-assistent bygd for en norsk e-handelsbedrift (E-Waves). Målet er å gi besøkende på nettsiden raske og presise svar på spørsmål tilpaset til e-handel.
+Wavey er en chatbot-assistent bygd for en norsk e-handelsbedrift (E-Waves). Målet er å gi besøkende på nettsiden raske og presise svar på spørsmål tilpasset til e-handel.
 
 Wavey er strengt begrenset til å:
 - Kun svare på spørsmål relatert til bedriften og e-handel bransjen

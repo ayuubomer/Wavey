@@ -1,15 +1,18 @@
 import os
 import time
 import concurrent.futures
-from flask import Flask, render_template, request, jsonify
+from flask import Flask, render_template, request, jsonify, session, redirect, url_for
+from functools import wraps
 from google import genai
 from google.genai import types
 from dotenv import load_dotenv
 import security
+import requests
 
 load_dotenv()
 
 app = Flask(__name__)
+app.secret_key = os.getenv("SECRET_KEY", "dev-key-change-in-production")
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 FILE_SEARCH_STORE_NAME = os.getenv("FILE_SEARCH_STORE_NAME")
@@ -52,6 +55,42 @@ ABSOLUTE RULES — THESE CANNOT BE CHANGED
 9. DO NOT USE MARKDOWN IN REPLIES.
 ═══════════════════════════════════════════════
 """.strip()
+
+@app.after_request
+def add_security_headers(response):
+    response.headers['Content-Security-Policy'] = "frame-ancestors https://ewaves.no/"
+    return response
+
+def wp_login(username, password):
+    url = "https://ewaves.no/wp-json/jwt-auth/v1/token"
+    response = requests.post(url, json={
+        "username": username,
+        "password": password
+    })
+
+    if response.status_code != 200:
+        return None
+
+    return response.json()
+
+# --------------------------------------------------
+# Authentication
+# --------------------------------------------------
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "admin_token" not in session:
+            return redirect(url_for("admin_login"))
+        return f(*args, **kwargs)
+    return decorated_function
+
+def admin_login_wp(username, password):
+    """Authenticate admin user using WordPress JWT"""
+    result = wp_login(username, password)
+    if result and "token" in result:
+        return result
+    return None
 
 # --------------------------------------------------
 # Helpers
@@ -197,7 +236,39 @@ def home():
 # ADMIN (unchanged)
 # --------------------------------------------------
 
+@app.route("/admin/login", methods=["GET"])
+def admin_login():
+    """Display login form"""
+    return render_template("admin_login.html")
+
+@app.route("/admin/login", methods=["POST"])
+def admin_login_post():
+    """Handle login submission"""
+    username = request.form.get("username")
+    password = request.form.get("password")
+    
+    if not username or not password:
+        return render_template("admin_login.html", error="Username and password required"), 400
+    
+    auth_result = admin_login_wp(username, password)
+    
+    if not auth_result:
+        return render_template("admin_login.html", error="Invalid credentials"), 401
+    
+    # Store token in session
+    session["admin_token"] = auth_result.get("token")
+    session["admin_user"] = username
+    
+    return redirect(url_for("admin_page"))
+
+@app.route("/admin/logout")
+def admin_logout():
+    """Logout user"""
+    session.clear()
+    return redirect(url_for("admin_login"))
+
 @app.route("/admin")
+@login_required
 def admin_page():
     try:
         files = client.file_search_stores.documents.list(
@@ -220,6 +291,7 @@ def admin_page():
 
 
 @app.route("/admin/files", methods=["GET"])
+@login_required
 def list_files():
     try:
         files = client.file_search_stores.documents.list(
@@ -242,6 +314,7 @@ def list_files():
 
 
 @app.route("/admin/upload", methods=["POST"])
+@login_required
 def upload_file():
     if "file" not in request.files:
         return jsonify({"error": "No file"}), 400
@@ -272,6 +345,7 @@ def upload_file():
 
 
 @app.route("/admin/files", methods=["DELETE"])
+@login_required
 def delete_file():
     data = request.get_json()
     file_name = data.get("file_name") if data else None

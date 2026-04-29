@@ -9,9 +9,47 @@ from dotenv import load_dotenv
 import security
 from llm import *
 from llm import _get_client_ip
+import requests
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "dev-key-change-in-production")
+
+
+@app.after_request
+def add_security_headers(response):
+    response.headers['Content-Security-Policy'] = "frame-ancestors https://ewaves.no/"
+    return response
+
+def wp_login(username, password):
+    url = "https://ewaves.no/wp-json/jwt-auth/v1/token"
+    response = requests.post(url, json={
+        "username": username,
+        "password": password
+    })
+
+    if response.status_code != 200:
+        return None
+
+    return response.json()
+
+# --------------------------------------------------
+# Authentication
+# --------------------------------------------------
+
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if "admin_token" not in session:
+            return redirect(url_for("admin_login"))
+        return f(*args, **kwargs)
+    return decorated_function
+
+def admin_login_wp(username, password):
+    """Authenticate admin user using WordPress JWT"""
+    result = wp_login(username, password)
+    if result and "token" in result:
+        return result
+    return None
 
 # --------------------------------------------------
 # Routes

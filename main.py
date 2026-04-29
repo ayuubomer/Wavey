@@ -10,6 +10,7 @@ import security
 from llm import *
 from llm import _get_client_ip
 import requests
+from werkzeug.utils import secure_filename
 
 app = Flask(__name__)
 app.secret_key = os.getenv("SECRET_KEY", "dev-key-change-in-production")
@@ -192,17 +193,19 @@ def upload_file():
 
     try:
         os.makedirs("temp_uploads", exist_ok=True)
-        temp_path = os.path.join("temp_uploads", file.filename)
+        temp_path = os.path.join("temp_uploads", secure_filename(file.filename))
 
         file.save(temp_path)
 
-        client.file_search_stores.upload_to_file_search_store(
-            file=temp_path,
-            file_search_store_name=FILE_SEARCH_STORE_NAME,
-            config={"display_name": file.filename},
-        )
-
-        os.remove(temp_path)
+        try:
+            client.file_search_stores.upload_to_file_search_store(
+                file=temp_path,
+                file_search_store_name=FILE_SEARCH_STORE_NAME,
+                config={"display_name": file.filename},
+            )
+        finally:
+            if os.path.exists(temp_path):
+                os.remove(temp_path)
 
         return jsonify({"message": "Upload successful"})
 

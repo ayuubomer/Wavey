@@ -10,49 +10,105 @@ from llm import *
 from llm import _get_client_ip
 from werkzeug.utils import secure_filename
 
+load_dotenv()
+
 app = Flask(__name__)
 
 # --------------------------------------------------
 # Routes
 # --------------------------------------------------
 
-@app.route("/query", methods=["POST"])
+# @app.route("/query", methods=["POST"])
+# def query():
+#     print("➡️ REQUEST STARTED")
+
+#     try:
+#         user_query = request.form.get("query")
+#         print("STEP 1: got query")
+
+#         if not user_query:
+#             return jsonify({"error": "Missing query"}), 400
+
+#         client_ip = _get_client_ip(request)
+#         print("STEP 2: got IP")
+
+#         # SECURITY (NO REDIS VERSION)
+#         sec_result = security.analyze_query(user_query, client_ip)
+#         print("STEP 3: security done")
+
+#         # OPTIONAL: you could block here if needed
+#         if sec_result.decision == "BLOCK":
+#             return jsonify({"error": "Blocked"}), 403
+
+#         if sec_result.decision == "LIMIT":
+#             time.sleep(2)
+
+#         result = generate_website_answer(sec_result.sanitized_query)
+#         print("STEP 4: LLM done")
+
+#         return jsonify({
+#             "response": result,
+#             "risk": sec_result.score,
+#             "decision": sec_result.decision
+#         })
+
+#     except Exception as e:
+#         print("ERROR:", e)
+#         return jsonify({"error": "Server error"}), 500
+
+import logging
+logger = logging.getLogger(__name__)
+ 
+@app.route("/query", methods=["POST", "GET"])
 def query():
-    print("➡️ REQUEST STARTED")
-
     try:
-        user_query = request.form.get("query")
-        print("STEP 1: got query")
-
+        if request.method == "POST":
+            user_query = (request.form.get ("query") or "").strip()
+        else:
+            user_query = request.args.get("query", "").strip()
+ 
         if not user_query:
-            return jsonify({"error": "Missing query"}), 400
-
+            return jsonify({"response": "Vennligst skriv et spørsmål"}), 400
+ 
         client_ip = _get_client_ip(request)
-        print("STEP 2: got IP")
-
-        # SECURITY (NO REDIS VERSION)
-        sec_result = security.analyze_query(user_query, client_ip)
-        print("STEP 3: security done")
-
-        # OPTIONAL: you could block here if needed
-        if sec_result.decision == "BLOCK":
-            return jsonify({"error": "Blocked"}), 403
-
-        if sec_result.decision == "LIMIT":
+ 
+        try:
+            sec_result = security.analyze_query(user_query, client_ip)
+        except ValueError:
+            return jsonify({"response": "Spørsmålet ditt kunne ikke behandles"}), 400
+        except Exception as e:
+            logger.error(f"Security check failed: {e}")
+            return jsonify({"response": "Spørsmålet ditt kunne ikke behandles"}), 400
+ 
+        if sec_result.blocked:
+            return jsonify({"response": "Forespørselen ble blokkert"}), 403
+ 
+        if sec_result.limited:
             time.sleep(2)
-
-        result = generate_website_answer(sec_result.sanitized_query)
-        print("STEP 4: LLM done")
-
-        return jsonify({
-            "response": result,
-            "risk": sec_result.score,
-            "decision": sec_result.decision
-        })
-
+ 
+        try:
+            answer = generate_website_answer(sec_result.sanitized_query)
+            return jsonify({
+                "response": answer,
+                "risk": sec_result.score,
+                "decision": sec_result.decision
+            }), 200
+ 
+        except TimeoutError:
+            return jsonify({
+                "response": "Spørsmålet ditt tok for lang tid. Vennligst prøv igjen.",
+                "error": "timeout"
+            }), 504
+ 
+        except Exception as e:
+            logger.exception(f"Error generating answer: {e}")
+            return jsonify({"response": "En feil oppstod ved behandling av spørsmålet"}), 500
+ 
     except Exception as e:
-        print("ERROR:", e)
-        return jsonify({"error": "Server error"}), 500
+        logger.exception(f"Unexpected error in /query: {e}")
+        return jsonify({"error": "Internal server error"}), 500
+ 
+ 
 
 
 @app.route("/")

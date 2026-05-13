@@ -92,8 +92,10 @@ Dette er det primære verktøyet for å vedlikeholde og oppdatere kunnskapsbasen
 
 ```
 Wavey/
-├── main.py              # Flask-app, ruter, LLM-logikk og to-stegs svarmotor
-├── security.py          # Risikoanalyse og IP-basert sikkerhetssystem
+├── main.py              # Flask-app, ruter og to-stegs svarmotor
+├── llm.py               # LLM-logikk og hjelpefunksjoner for Gemini-kall
+├── security/            # Mappe for risikoanalyse og sikkerhetssystem
+│   └── security.py      # IP-basert risikoanalyse og blokkering
 ├── requirements.txt     # Python-avhengigheter
 ├── .env                 # Miljøvariabler (skal IKKE committes til git)
 ├── static/
@@ -104,8 +106,6 @@ Wavey/
     ├── index.html       # Hovedside med chatbot-grensesnitt
     └── admin.html       # Admin-panel for kunnskapsdatabasen
 ```
-
----
 
 ## Kom i gang – lokal oppsett
 

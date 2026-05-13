@@ -92,20 +92,39 @@ Dette er det primære verktøyet for å vedlikeholde og oppdatere kunnskapsbasen
 
 ```
 Wavey/
-├── main.py              # Flask-app, ruter og to-stegs svarmotor
-├── llm.py               # LLM-logikk og hjelpefunksjoner for Gemini-kall
-├── security/            # Mappe for risikoanalyse og sikkerhetssystem
-│   └── security.py      # IP-basert risikoanalyse og blokkering
-├── requirements.txt     # Python-avhengigheter
-├── .env                 # Miljøvariabler (skal IKKE committes til git)
-├── static/
-│   ├── Ewavespng.png    # Bedriftslogo (PNG)
-│   └── e-waves logo.jpg # Bedriftslogo (JPG)
-└── templates/
-    ├── base.html        # Felles HTML-base
-    ├── index.html       # Hovedside med chatbot-grensesnitt
-    └── admin.html       # Admin-panel for kunnskapsdatabasen
+├── .gitignore                         # Ignorerer venv, __pycache__, .env, IDE-filer, build-output m.m.
+├── README.md                          # Prosjektdokumentasjon
+├── llm.py                             # Gemini-klient, systeminstruksjon, RAG-logikk og fallback til Google Search
+├── main.py                            # Flask-app, ruter, WordPress-adminlogin, sikkerhetssjekk og filadministrasjon
+├── requirements.txt                   # Python-avhengigheter
+├── security/                          # Sikkerhetspakke for input-analyse og risikohåndtering
+│   ├── __init__.py                    # Eksponerer public API: analyze_query, SecurityResult og Decision
+│   ├── config.py                      # Terskler, vekter, timeouts og IP-konfigurasjon
+│   ├── ip_store.py                    # In-memory IP-risiko, velocity og request-historikk
+│   ├── models.py                      # Datamodeller og beslutningstyper
+│   ├── pipeline.py                    # Security-pipeline: validate → sanitize → detect → score → policy
+│   ├── policy.py                      # Beslutningslogikk basert på samlet risikoscore
+│   ├── scoring.py                     # Kombinerer detektor-score, IP-risiko og velocity
+│   ├── validation.py                  # Inputvalidering og sanitering
+│   └── detectors/                     # Enkeltstående detektorer for mistenkelig input
+│       ├── __init__.py                # Samler og kjører alle detektorer
+│       ├── anomaly.py                 # Oppdager strukturelle avvik i input
+│       ├── encoding.py                # Oppdager encoding-/base64-lignende triks
+│       ├── injection.py               # Oppdager prompt-injection-forsøk
+│       └── obfuscation.py             # Oppdager skjulte/usynlige Unicode-tegn og obfuskering
+├── static/                            # Statiske frontend-filer
+│   ├── styles.css                     # CSS for brukergrensesnittet
+│   └── images/                        # Bilder og logoer
+│       ├── Ewavespng.png              # E-Waves-logo/illustrasjon
+│       └── e-waves logo.jpg           # E-Waves-logo/illustrasjon
+└── templates/                         # Jinja2 HTML-templates
+    ├── admin.html                     # Admin-panel for dokumenter i File Search Store
+    ├── admin_login.html               # Innloggingsside for admin
+    ├── base.html                      # Felles HTML-base/layout
+    ├── index.html                     # Hovedside med chatbot-grensesnitt
+    └── readme.md                      # Ekstra README/notes-fil lagret under templates
 ```
+> Merk: `.env` og `temp_uploads/` brukes lokalt/runtime, men skal ikke committes til Git. `.env` er allerede ignorert i `.gitignore`, og `temp_uploads/` opprettes midlertidig ved filopplasting.
 
 ## Kom i gang – lokal oppsett
 

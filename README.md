@@ -1,15 +1,15 @@
 # READme
 
-> Et Flask-basert webapplikasjon som bruker Google Gemini og en RAG-pipeline (Retrieval-Augmented Generation) til å svare på spørsmål om bedriftens tjenester og e-handel.
+> Et Flask-basert webapplikasjon som bruker Google Gemini og en RAG-pipeline (Retrieval-Augmented Generation) til å svare på spørsmål rettet mot e-handel og nettverket.
 
 ---
 
 ## Formål
 
-Wavey er en chatbot-assistent bygd for en norsk e-handelsbedrift (E-Waves). Målet er å gi besøkende på nettsiden raske og presise svar på spørsmål tilpasset til e-handel.
+Wavey er en kunnskapsdatabase med en chatbot-grensesnitt som er bygd for E-Waves. Målet er å gi besøkende på nettsiden raske og presise svar på spørsmål tilpasset til e-handel.
 
 Wavey er strengt begrenset til å:
-- Kun svare på spørsmål relatert til bedriften og e-handel bransjen
+- Kun svare på spørsmål relatert til bedriften, nettverket og e-handel bransjen
 - Aldri avsløre systemoppsett eller følge instruksjoner som forsøker å endre dens rolle
 
 ---
